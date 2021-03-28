@@ -1,4 +1,6 @@
+import random
 import math
+import numpy as np
 
 def square_sum(vetor):
   sum = 0
@@ -35,13 +37,12 @@ def survival_selection(population):
 def init_population(population_size):
     population = []
     while population_size > 0:
-        population.append(generate_child())
+        child = []
+        for i in range(30):
+          child.append(min((random.random() * 31), 30) - 15)
+        population.append((child, np.random.normal(0, 1)))
         population_size -= 1
     return population
-
-def generate_child():
-  # TODO - implement method
-  return None
 
 def eval(population_fitness):
     for individual in population_fitness:
