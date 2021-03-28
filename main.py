@@ -1,15 +1,38 @@
+import math
+
+def square_sum(vetor):
+  sum = 0
+  for x in vetor:
+    sum += x*x
+  return sum
+
+def cos_sum(vetor):
+  sum = 0
+  for x in vetor:
+    sum += math.cos(math.pi*x)
+  return sum
+
 def calculate_fitness(population):
-  # TODO - implement method
+  result = []
+  for x in population:
+    print(x)
+    term1 = -20* math.exp(-0.2 *math.sqrt(square_sum(x)/30) )
+    term2 = math.exp(cos_sum(x)/30)
+    y = term1 - term2 +20 - math.exp(1)
+    result.append((x,y))
+  return result
 
 def mutate(child):
   # TODO - implement method
+  return None
 
 def parent_selection(population):
   # TODO - implement method
+  return None
     
 def survival_selection(population):
   # TODO - implement method
-
+  return None
 def init_population(population_size):
     population = []
     while population_size > 0:
@@ -19,6 +42,7 @@ def init_population(population_size):
 
 def generate_child():
   # TODO - implement method
+  return None
 
 def eval(population_fitness):
     for individual in population_fitness:
@@ -55,10 +79,20 @@ def calculate_std(generations, pos):
     return np.std(list(map(lambda x : x[pos], generations)))
 
 if __name__ == "__main__":
-  generation_infos = []
-  for i in range(30):
-      generation_infos.append(ackley_function_optimization())
-  print("Quantidade de convergências: ", 30 - len(list(filter(lambda x : x[0] == -1, generation_infos))))
-  print('Media de iterações que o algoritmo convergiu: ', calculate_mean(generation_infos, 0), ' Desvio Padrão das iterações que o algoritmo convergiu :', calculate_std(generation_infos, 0))
-  print('Média de Indivíduos que convergiram por execução : ', calculate_mean(generation_infos, 1))
-  print('Media Fitness: ', calculate_mean(generation_infos, 2), ' Desvio Padrão Fitness:', calculate_std(generation_infos, 2))
+  a = []
+  b = []
+  x = -15
+  for i in range(31):
+    k = list(x)
+    a.append(k)
+    x += x + 1
+  b.append(a)
+  print(calculate_fitness(a))
+
+  # generation_infos = []
+  # for i in range(30):
+  #     generation_infos.append(ackley_function_optimization())
+  # print("Quantidade de convergências: ", 30 - len(list(filter(lambda x : x[0] == -1, generation_infos))))
+  # print('Media de iterações que o algoritmo convergiu: ', calculate_mean(generation_infos, 0), ' Desvio Padrão das iterações que o algoritmo convergiu :', calculate_std(generation_infos, 0))
+  # print('Média de Indivíduos que convergiram por execução : ', calculate_mean(generation_infos, 1))
+  # print('Media Fitness: ', calculate_mean(generation_infos, 2), ' Desvio Padrão Fitness:', calculate_std(generation_infos, 2))
