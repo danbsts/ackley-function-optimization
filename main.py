@@ -14,12 +14,11 @@ def cos_sum(vetor):
 
 def calculate_fitness(population):
   result = []
-  for x in population:
-    print(x)
+  for x,desvio in population:
     term1 = -20* math.exp(-0.2 *math.sqrt(square_sum(x)/30) )
     term2 = math.exp(cos_sum(x)/30)
     y = term1 - term2 +20 - math.exp(1)
-    result.append((x,y))
+    result.append((x,desvio,y))
   return result
 
 def mutate(child):
@@ -80,14 +79,16 @@ def calculate_std(generations, pos):
 
 if __name__ == "__main__":
   a = []
-  b = []
   x = -15
   for i in range(31):
-    k = list(x)
+    k = ([x],2)
     a.append(k)
-    x += x + 1
-  b.append(a)
-  print(calculate_fitness(a))
+    x += 1
+
+  j = calculate_fitness(a)
+  j.sort(key=lambda tup: tup[2], reverse=False)
+  for i in j:
+    print(i)
 
   # generation_infos = []
   # for i in range(30):
