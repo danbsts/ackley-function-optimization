@@ -23,9 +23,17 @@ def calculate_fitness(population):
     result.append((x,desvio,y))
   return result
 
-def mutate(child):
-  # TODO - implement method
-  return None
+def mutate(parents, pop_size):
+  new_population = []
+  while(len(new_population) < 1 * pop_size):
+    random_idx = random.randint(0, len(parents) - 1)
+    (parent_feature, std_deviation) = parents[random_idx]
+    new_std_deviation =  abs(std_deviation * math.exp((1/pow(len(parent_feature), 0.5)) * np.random.normal(0, 1)))
+    child_feature = []
+    for i in range(len(parent_feature)):
+      child_feature.append(max(min(parent_feature[i] + np.random.normal(0, new_std_deviation), 15), -15))
+    new_population.append((child_feature, new_std_deviation))
+  return new_population
 
 def parent_selection(population):
   parents = []
