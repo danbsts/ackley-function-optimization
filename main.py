@@ -11,15 +11,15 @@ def square_sum(vetor):
 def cos_sum(vetor):
   sum = 0
   for x in vetor:
-    sum += math.cos(math.pi*x)
+    sum += math.cos(math.pi*2*x)
   return sum
 
 def calculate_fitness(population):
   result = []
   for x,desvio in population:
-    term1 = -20* math.exp(-0.2 *math.sqrt(square_sum(x)/30) )
-    term2 = math.exp(cos_sum(x)/30)
-    y = term1 - term2 +20 - math.exp(1)
+    term1 = (-20)* math.exp( (-0.2) *math.sqrt(square_sum(x)/30.0) )
+    term2 = -math.exp(cos_sum(x)/30.0)
+    y =  term2 + math.exp(1) +term1 + 20.0 
     result.append((x,desvio,y))
   return result
 
@@ -80,13 +80,12 @@ def calculate_std(generations, pos):
 
 if __name__ == "__main__":
   a = []
-  x = -15
-  for i in range(31):
-    k = ([x],2)
-    a.append(k)
-    x += 1
-
-  j = calculate_fitness(a)
+  b = []
+  for i in range(30):
+    a.append(0)
+  desvio = 2
+  b.append((a,desvio))
+  j = calculate_fitness(b)
   j.sort(key=lambda tup: tup[2], reverse=False)
   for i in j:
     print(i)
