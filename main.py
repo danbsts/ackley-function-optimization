@@ -28,12 +28,16 @@ def mutate(child):
   return None
 
 def parent_selection(population):
-  # TODO - implement method
-  return None
+  parents = []
+  for element in population:
+    if random.random() >= 0.5:
+      parents.append(element)
+  return parents
     
-def survival_selection(population):
-  # TODO - implement method
-  return None
+def survival_selection(new_population, population_size):
+  new_population.sort(key=lambda tup: tup[2])
+  return new_population[:population_size]
+
 def init_population(population_size):
     population = []
     while population_size > 0:
@@ -89,7 +93,6 @@ if __name__ == "__main__":
   j.sort(key=lambda tup: tup[2], reverse=False)
   for i in j:
     print(i)
-
   # generation_infos = []
   # for i in range(30):
   #     generation_infos.append(ackley_function_optimization())
