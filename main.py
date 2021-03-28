@@ -23,11 +23,11 @@ def calculate_fitness(population):
     result.append((x,desvio,y))
   return result
 
-def mutate(parents, pop_size):
+def mutate(population):
   new_population = []
-  while(len(new_population) < 1 * pop_size):
-    random_idx = random.randint(0, len(parents) - 1)
-    (parent_feature, std_deviation) = parents[random_idx]
+  while(len(new_population) < 7 * len(population)):
+    random_idx = random.randint(0, len(population) - 1)
+    (parent_feature, std_deviation, parent_fitness) = population[random_idx]
     new_std_deviation =  abs(std_deviation * math.exp((1/pow(len(parent_feature), 0.5)) * np.random.normal(0, 1)))
     child_feature = []
     for i in range(len(parent_feature)):
@@ -37,9 +37,10 @@ def mutate(parents, pop_size):
 
 def parent_selection(population):
   parents = []
-  for element in population:
-    if random.random() >= 0.5:
-      parents.append(element)
+  while len(parents) < len(population):
+    random_number = random.randint(len(population)) - 1
+    parents.append(population[random_number])
+    population.pop(random_number)
   return parents
     
 def survival_selection(new_population, population_size):
@@ -58,31 +59,30 @@ def init_population(population_size):
 
 def eval(population_fitness):
     for individual in population_fitness:
-        if individual[1] == 1:
+        if individual[2] == 0:
             return individual[0]
-    
     return None
 
 def ackley_function_optimization():
-    population = init_population(100)
-    population_fitness = calculate_fitness(population)
-    solution = eval(population_fitness)
-    count = 0
-    while solution == None and count < 10000:
-        # parents = parent_selection(population_fitness)
-        # children = cut_and_crossfill(parents)
-        # children = list(map(lambda child: mutate(child) if random.random() <= 0.4 else child, children)) 
-        # children = calculate_fitness(children)
-        # population_fitness.append(children[0])
-        # population_fitness.append(children[1])
-        # population_fitness = survival_selection(population_fitness)
-        # solution = eval(population_fitness)
-        count += 1
-    if count == 10000:
-        return -1
-    else:
-        total_converged = len(list(filter(lambda x : x[1] == 1, population_fitness)))
-        return (count, total_converged, calculate_mean(population_fitness,1), calculate_std(population_fitness,1))
+  population_size = 20
+  iterations = 10000
+  population = init_population(population_size)
+  population_fitness = calculate_fitness(population)
+  solution = eval(population_fitness)
+  count = 0
+  while solution == None and count < iterations:
+      children = mutate(population_fitness)
+      children_fitness = calculate_fitness(children)
+      population_fitness = survival_selection(children_fitness, population_size)
+      solution = eval(population_fitness)
+      print(count, '->', population_fitness[0][2])
+      count += 1
+      if count % 30 == 0: print("\033[H\033[J")
+  if count == iterations:
+      return (-1, 0, 1000, 0)
+  else:
+      total_converged = len(list(filter(lambda x : x[2] == 0, population_fitness)))
+      return (count, total_converged, calculate_mean(population_fitness,2), calculate_std(population_fitness,2))
 
 def calculate_mean(generations, pos):
     return np.mean(list(map(lambda x : x[pos], generations)))
@@ -91,20 +91,11 @@ def calculate_std(generations, pos):
     return np.std(list(map(lambda x : x[pos], generations)))
 
 if __name__ == "__main__":
-  a = []
-  b = []
-  for i in range(30):
-    a.append(0)
-  desvio = 2
-  b.append((a,desvio))
-  j = calculate_fitness(b)
-  j.sort(key=lambda tup: tup[2], reverse=False)
-  for i in j:
-    print(i)
-  # generation_infos = []
-  # for i in range(30):
-  #     generation_infos.append(ackley_function_optimization())
-  # print("Quantidade de convergências: ", 30 - len(list(filter(lambda x : x[0] == -1, generation_infos))))
-  # print('Media de iterações que o algoritmo convergiu: ', calculate_mean(generation_infos, 0), ' Desvio Padrão das iterações que o algoritmo convergiu :', calculate_std(generation_infos, 0))
-  # print('Média de Indivíduos que convergiram por execução : ', calculate_mean(generation_infos, 1))
-  # print('Media Fitness: ', calculate_mean(generation_infos, 2), ' Desvio Padrão Fitness:', calculate_std(generation_infos, 2))
+  generation_infos = []
+  for i in range(1):
+      generation_infos.append(ackley_function_optimization())
+  print(generation_infos)
+  print("Quantidade de convergências: ", 1 - len(list(filter(lambda x : x[0] == -1, generation_infos))))
+  print('Media de iterações que o algoritmo convergiu: ', calculate_mean(generation_infos, 0), ' Desvio Padrão das iterações que o algoritmo convergiu :', calculate_std(generation_infos, 0))
+  print('Média de Indivíduos que convergiram por execução : ', calculate_mean(generation_infos, 1))
+  print('Media Fitness: ', calculate_mean(generation_infos, 2), ' Desvio Padrão Fitness:', calculate_std(generation_infos, 2))
