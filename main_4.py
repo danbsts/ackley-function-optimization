@@ -46,7 +46,7 @@ def mutate(population): #1.899744051
   get_constant()
   successful_mutations = 0
   total_mutations = 0
-  while(len(new_population) < 7 * len(population)):
+  while(len(new_population) < 14 * len(population)):
     random_idx = random.randint(0, len(population) - 1)
     (parent_feature, parent_fitness) = population[random_idx]
     child = []

@@ -51,15 +51,15 @@ def mutate(population): #1.899744051
     (parent_feature, parent_fitness) = population[random_idx]
     child = []
     for (feature, std_deviation) in parent_feature:
-      std_deviation = max(std_deviation, 1.5e-1)
       t = 1/pow(len(parent_feature), 0.5)
       t_line = 1/pow((2*pow(len(parent_feature), 0.5)), 0.5)
       new_std_deviation =  abs(std_deviation * math.exp((t * np.random.normal(0, 1)) + (t_line * np.random.normal(0,1))))
+      new_std_deviation = max(new_std_deviation, 1.5e-1)
       if todo == 'divide':
         new_std_deviation /= deviation_constant
       elif todo == 'multiply':
         new_std_deviation *= deviation_constant
-      new_feature = max(min(feature + np.random.normal(0, new_std_deviation), 15), -15)
+      new_feature = max(min(feature + new_std_deviation*np.random.normal(0, 1), 15), -15)
       child.append((new_feature, new_std_deviation))
     child_fitness = calculate_fitness(child)
     if child_fitness[1] < parent_fitness:
@@ -113,12 +113,8 @@ def ackley_function_optimization():
       solution = eval(population_fitness)
       if count % 20 == 0: print(count, '->', population_fitness[0][1], todo, '--', successful_mutations/total_mutations, 'dis->',calculate_mean(list(map(lambda x: x[0], population_fitness)), 1))
       count += 1
-      if count % 3000 == 0: print("\033[H\033[J")
-  if count == iterations:
-      return (-1, 0, 1000, 0)
-  else:
-      total_converged = len(list(filter(lambda x : x[2] == 0, population_fitness)))
-      return (count, total_converged, calculate_mean(population_fitness,2), calculate_std(population_fitness,2))
+  return (population_fitness[0][1], calculate_mean(population_fitness,1), calculate_std(population_fitness, 1))
+
 
 def calculate_mean(generations, pos):
     return np.mean(list(map(lambda x : x[pos], generations)))
@@ -131,7 +127,6 @@ if __name__ == "__main__":
   for i in range(1):
       generation_infos.append(ackley_function_optimization())
   print(generation_infos)
-  print("Quantidade de convergências: ", 1 - len(list(filter(lambda x : x[0] == -1, generation_infos))))
-  print('Media de iterações que o algoritmo convergiu: ', calculate_mean(generation_infos, 0), ' Desvio Padrão das iterações que o algoritmo convergiu :', calculate_std(generation_infos, 0))
-  print('Média de Indivíduos que convergiram por execução : ', calculate_mean(generation_infos, 1))
-  print('Media Fitness: ', calculate_mean(generation_infos, 2), ' Desvio Padrão Fitness:', calculate_std(generation_infos, 2))
+  print("Quantidade de convergências: ", len(list(filter(lambda x : x[0] == 0, generation_infos))))
+  print('Media de fitness dos melhores indivíduos de cada execução: ', calculate_mean(generation_infos, 0), ' Desvio Padrão dos melhores indivíduos de cada execução :', calculate_std(generation_infos, 0))
+  print('Media Fitness: ', calculate_mean(generation_infos, 1), ' Desvio Padrão Fitness:', calculate_std(generation_infos, 2))
