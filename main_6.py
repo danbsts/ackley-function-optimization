@@ -1,6 +1,7 @@
 import random
 import math
 import numpy as np
+from functools import reduce
 
 successful_mutations = 0
 total_mutations = 0
@@ -46,8 +47,9 @@ def mutate(population): #1.899744051
   get_constant()
   successful_mutations = 0
   total_mutations = 0
+  roleta = parent_selection(population)
   while(len(new_population) < 14 * len(population)):
-    random_idx = random.randint(0, len(population) - 1)
+    random_idx = spin_wheel(roleta, random.random())
     (parent_feature, parent_fitness) = population[random_idx]
     child = []
     for (feature, std_deviation) in parent_feature:
@@ -68,13 +70,27 @@ def mutate(population): #1.899744051
     new_population.append(child)
   return new_population 
 
+def spin_wheel(roleta, sorted_probability):
+  for idx, probability in enumerate(roleta):
+      if idx > 0:
+          if(sorted_probability <= probability and sorted_probability > roleta[idx-1]):
+              break
+      else:
+          if(sorted_probability <= probability):
+              break
+  return idx
+
 def parent_selection(population):
+  total_fitness = reduce(lambda x,y: x + y[1], population,0)
+  parents = population
+  roleta = []
+  current_probability=0
+  parents.sort(key=lambda tup: tup[1], reverse=False)
+  for parent in parents:
+        roleta.append(current_probability + (parent[1]/total_fitness)) 
+        current_probability = roleta[-1]
   parents = []
-  while len(parents) < len(population):
-    random_number = random.randint(len(population)) - 1
-    parents.append(population[random_number])
-    population.pop(random_number)
-  return parents
+  return roleta
     
 def survival_selection(new_population, population_size):
   new_population.sort(key=lambda tup: tup[1])
@@ -99,7 +115,7 @@ def eval(population_fitness):
 def ackley_function_optimization():
   global todo, total_mutations, successful_mutations
   population_size = 100
-  iterations = 2000
+  iterations = 10000
   population = init_population(population_size)
   population_fitness = calculate_population_fitness(population)
   solution = eval(population_fitness)
@@ -124,7 +140,7 @@ def calculate_std(generations, pos):
 
 if __name__ == "__main__":
   generation_infos = []
-  for i in range(5):
+  for i in range(1):
       generation_infos.append(ackley_function_optimization())
   print(generation_infos)
   print("Quantidade de convergências: ", len(list(filter(lambda x : x[0] == 0, generation_infos))))
