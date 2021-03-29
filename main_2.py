@@ -50,20 +50,24 @@ def mutate(population): #1.899744051
   while(len(new_population) < 7 * len(population)):
     random_idx = random.randint(0, len(population) - 1)
     (parent_feature, std_deviation, parent_fitness) = population[random_idx]
-    std_deviation = max(std_deviation, 1.55e-1)
     new_std_deviation =  abs(std_deviation * math.exp((1/pow(len(parent_feature), 0.5)) * np.random.normal(0, 1)))
+    std_deviation = max(std_deviation, 1.55e-1)
     if todo == 'divide':
       new_std_deviation /= deviation_constant
     elif todo == 'multiply':
       new_std_deviation *= deviation_constant
-    child_feature = []
+    child_feature = parent_feature[:]
     for i in range(len(parent_feature)):
-        child_feature.append(max(min(parent_feature[i] + np.random.normal(0, new_std_deviation), 15), -15))
+      child_feature[i] = max(min(parent_feature[i] + new_std_deviation*np.random.normal(0, 1), 15), -15)
+      if(calculate_fitness((child_feature, new_std_deviation))[2] >= parent_fitness):
+        child_feature[i] = parent_feature[i]
+      else:
+        successful_mutations += 1
+      total_mutations += 1
     child = (child_feature, new_std_deviation)
     child_fitness = calculate_fitness(child)
-    if child_fitness[2] < parent_fitness:
-      successful_mutations += 1
-    total_mutations += 1
+      
+   
     new_population.append(child)
   return new_population
 
@@ -97,7 +101,7 @@ def eval(population_fitness):
 
 def ackley_function_optimization():
   global todo, total_mutations, successful_mutations
-  population_size = 20
+  population_size = 1
   iterations = 10000
   population = init_population(population_size)
   population_fitness = calculate_population_fitness(population)
